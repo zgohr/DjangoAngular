@@ -1,0 +1,20 @@
+{% load angularjs %}
+<!doctype html>
+<html ng-app>
+    <head>
+        <script src="{{ STATIC_URL }}angular/js/angular-1.0.1.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+        <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.min.css">
+    </head>
+
+    <body>
+        <div>
+            <label>Name:</label>
+            <input type="text" ng-model="yourName" placeholder="Enter a name here">
+            <hr>
+            <h1>Hello {% ng yourName %}!</h1>
+        </div>
+    </body>
+</html>
