@@ -1,14 +1,22 @@
 function TraderCtrl($scope) {
   $scope.orders = [];
 
+  $('.typeahead').typeahead({
+    source: function (){
+      var names = []
+      angular.forEach($scope.orders, function(order) {
+        names.push(order.item);
+      });
+      return names;
+    }
+  });
+
   $scope.addOrder = function() {
     $scope.orders.push({
       item: $scope.orderItem,
       amount: $scope.orderAmount,
       quantity: $scope.orderQuantity,
-      //value: $scope.orderAmount * $scope.orderQuantity,
       fills: 0,
-      //inventory_value: 0,
       filled: false,
       complete: false
     });
