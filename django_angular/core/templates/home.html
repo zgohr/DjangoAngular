@@ -21,26 +21,37 @@
 
             <div class="container" ng-controller="TraderCtrl">
                 <div class="row">
-                    <div class="span6">
+                    <div class="span10">
                         <h1>Hello {% ng yourName %}!</h1>
-                        <form class="form form-inline" ng-submit="addOrder()">
+                        <form name="orderForm"
+                            class="form form-inline">
+
                             <input class="input-small typeahead"
                                 type="text" 
-                                ng-model="orderItem" 
+                                ng-model="item" 
                                 placeholder="item" required>
                             <div class="input-prepend">
-                                <span class="add-on">$</span>
-                                <input class="input-small" type="number" 
-                                    min="0"
-                                    ng-model="orderAmount"
-                                    placeholder="amount" required>
+                                <span class="add-on">g</span>
+                                <input class="input-small"
+                                    type="text" 
+                                    ng-model="price"
+                                    ng-pattern="gold"
+                                    placeholder="price per" required>
                             </div>
                             <input class="input-small"
                                 type="number"
-                                min="-250"
+                                min="0"
                                 max="250"
-                                ng-model="orderQuantity" placeholder="quantity" required>
-                            <input class="btn" type="submit" value="Place Order">
+                                ng-model="quantity" placeholder="quantity" required>
+                            <input class="btn"
+                                ng-disabled="orderForm.$invalid"
+                                ng-click="placeBuyOrder()"
+                                type="submit" value="Place Buy Order">
+                            <input class="btn"
+                                ng-click="placeSellOrder()"
+                                ng-disabled=
+                                    "orderForm.$invalid || !hasInventory(item, quantity)"
+                                type="submit" value="Place Sell Order">
                         </form>
                     </div>
                 </div>
@@ -50,28 +61,28 @@
                             <thead>
                                 <tr>
                                     <td>Item</td>
-                                    <td>Amount</td>
+                                    <td>Price</td>
                                     <td>Quantity</td>
-                                    <td>Order Value</td>
+                                    <td>Value</td>
                                     <td>Fills</td>
                                     <td>Inventory Value</td>
                                     <td>Actions</td>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="order in orders" class="{% ng status(order) %}">
-                                    <td>{% ng order.item %}</td>
-                                    <td>{% ng order.amount | currency %}</td>
+                                <tr ng-repeat="order in buyOrders" class="{% ng status(order) %}">
+                                    <td>{% ng order.name %}</td>
+                                    <td>{% ng order.price | number:4 %}</td>
                                     <td>{% ng order.quantity %}</td>
-                                    <td>{% ng orderValue(order) | currency %}</td>
+                                    <td>{% ng order.price * order.quantity | number:4 %}</td>
                                     <td>
                                         <input class="input-mini" type="number"
                                             min="0"
-                                            max="{% ng getAbsQuantity(order) %}"
+                                            max="order.quantity"
                                             ng-disabled="order.complete"
-                                            ng-model="order.fills" ng-change="fills(order)">
+                                            ng-model="order.fills">
                                     </td>
-                                    <td>{% ng inventoryValue(order) | currency %}</td>
+                                    <td>{% ng inventoryValue(order) | number:4 %}</td>
                                     <td>
                                         <button ng-click="markComplete(order)"
                                             class="btn btn-mini">Complete</button>
@@ -84,8 +95,8 @@
                         </table>
                     </div> <!-- table div -->
                     <div class="span3">
-                        <p>Total order value: <strong>{% ng orderValue() | currency %}</strong></p>
-                        <p>Total inventory value: <strong>{% ng inventoryValue() | currency %}</strong></p>
+                        <p>Total buy value: <strong>{% ng buyOrderValue() | number:4 %}</strong></p>
+                        <p>Total inventory value: <strong>{% ng inventoryValue() | number:4 %}</strong></p>
                     </div>
                 </div> <!-- table row -->
             </div> <!-- ng-controller div -->

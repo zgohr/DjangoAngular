@@ -1,5 +1,7 @@
 function TraderCtrl($scope) {
-  $scope.orders = [];
+  $scope.buyOrders = [];
+  $scope.sellOrders = [];
+  $scope.gold = /^\d*(\.\d{1,4})?$/;
 
   $('.typeahead').typeahead({
     source: function (){
@@ -11,65 +13,84 @@ function TraderCtrl($scope) {
     }
   });
 
-  $scope.addOrder = function() {
-    $scope.orders.push({
-      item: $scope.orderItem,
-      amount: $scope.orderAmount,
-      quantity: $scope.orderQuantity,
+  $scope.resetBSForm = function() {
+    $scope.item = '';
+    $scope.price = '';
+    $scope.quantity = '';
+  };
+
+  $scope.formData = function() {
+    return {
+      name: $scope.item,
+      price: $scope.price,
+      quantity: $scope.quantity,
       fills: 0,
-      filled: false,
-      complete: false
+      locked: false
+    }
+  };
+
+  $scope.placeBuyOrder = function() {
+    $scope.buyOrders.push($scope.formData());
+    $scope.resetBSForm();
+  };
+
+  $scope.placeSellOrder = function() {
+    $scope.sellOrders.push($scope.formData())
+    $scope.resetBSForm();
+  };
+
+  $scope.hasInventory = function(item, quantity) {
+    var purchasedQuantity = 0;
+    var sellOrderQuantity = 0;
+    var onHandInventory = 0;
+
+    angular.forEach($scope.buyOrders, function(order){
+      if (order.name === item) {
+        purchasedQuantity += order.fills;
+      }
     });
-    $scope.orderItem = '';
-    $scope.orderAmount = '';
-    $scope.orderQuantity = '';
+    angular.forEach($scope.sellOrders, function(order){
+      if (order.name === item) {
+        sellOrderQuantity += order.quantity;
+      }
+    });
+
+    onHandInventory = purchasedQuantity - sellOrderQuantity;
+
+    return onHandInventory >= quantity;
   };
 
   $scope.deleteOrder = function(order) {
-    $scope.orders.splice($.inArray(order, $scope.orders),1);
+    if ($.inArray(order, $scope.buyOrders)) {
+      $scope.buyOrders.splice($.inArray(order, $scope.buyOrders),1);
+    } else {
+      $scope.sellOrders.splice($.inArray(order, $scope.sellOrders),1);
+    }
   };
 
-  $scope.markComplete = function(order){
-    order.complete = !order.complete;
-    return order.complete;
+  $scope.lock = function(order){
+    order.locked = !order.locked;
+    return order.locked;
   };
 
-  $scope.orderValue = function(order){
+  $scope.buyOrderValue = function(order){
     var total = 0;
     if (order) {
-      return Math.abs((order.quantity - order.fills) * order.amount);
+      return (order.quantity - order.fills) * order.amount;
     }
-    angular.forEach($scope.orders, function(order){
+    angular.forEach($scope.buyOrders, function(order){
       total += (order.quantity - order.fills) * order.amount;
-    });
-    return Math.abs(total);
-  };
-
-  $scope.getAbsQuantity = function(order){
-    return Math.abs(order.quantity)
-  };
-
-  $scope.inventoryValue = function(order){
-    var total = 0;
-    if (order) {
-      return Math.abs(order.fills * order.amount);
-    }
-    angular.forEach($scope.orders, function(order){
-      total += order.fills * order.amount;
     });
     return total;
   };
 
-  $scope.fills = function(order) {
-    if (order.fills === order.quantity) {
-      order.filled = true;
-    } else {
-      order.filled = false;
-    }
+  $scope.inventoryValue = function(order){
+    var total = 0;
+    return total;
   };
 
   $scope.status = function(order) {
-    if (order.filled) {
+    if (order.fills === order.quantity) {
       return 'success'
     } else {
       return 'info';
