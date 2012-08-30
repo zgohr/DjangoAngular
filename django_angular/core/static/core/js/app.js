@@ -6,10 +6,13 @@ function TraderCtrl($scope) {
   $('.typeahead').typeahead({
     source: function (){
       var names = []
-      angular.forEach($scope.orders, function(order) {
-        names.push(order.item);
+      angular.forEach($scope.buyOrders, function(order) {
+        names.push(order.name);
       });
-      return names;
+      angular.forEach($scope.sellOrders, function(order) {
+        names.push(order.name);
+      });
+      return $.unique(names);
     }
   });
 
@@ -39,25 +42,36 @@ function TraderCtrl($scope) {
     $scope.resetBSForm();
   };
 
-  $scope.hasInventory = function(item, quantity) {
+  $scope.getPurchasedQuantity = function(item) {
     var purchasedQuantity = 0;
-    var sellOrderQuantity = 0;
-    var onHandInventory = 0;
 
     angular.forEach($scope.buyOrders, function(order){
       if (order.name === item) {
         purchasedQuantity += order.fills;
       }
     });
+
+    return purchasedQuantity;
+  };
+
+  $scope.getSellOrderQuantity = function(item) {
+    var sellOrderQuantity = 0;
+
     angular.forEach($scope.sellOrders, function(order){
       if (order.name === item) {
         sellOrderQuantity += order.quantity;
       }
     });
 
-    onHandInventory = purchasedQuantity - sellOrderQuantity;
+    return sellOrderQuantity;
+  };
 
-    return onHandInventory >= quantity;
+  $scope.getOnHandInventory = function(item) {
+    return $scope.getPurchasedQuantity(item) - $scope.getSellOrderQuantity(item);
+  };
+
+  $scope.hasQuantity = function(item, quantity) {
+    return $scope.getOnHandInventory(item) >= quantity;
   };
 
   $scope.deleteOrder = function(order) {
@@ -93,7 +107,7 @@ function TraderCtrl($scope) {
     if (order.fills === order.quantity) {
       return 'success'
     } else {
-      return 'info';
+      return '';
     }
   };
 }

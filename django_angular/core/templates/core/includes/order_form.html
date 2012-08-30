@@ -1,0 +1,34 @@
+<form name="orderForm"
+    class="form form-inline">
+
+    <input class="input-small typeahead"
+        type="text" 
+        ng-model="item" 
+        placeholder="item" required>
+    <div class="input-prepend">
+        <span class="add-on">g</span>
+        <input class="input-small"
+            type="text" 
+            ng-model="price"
+            ng-pattern="gold"
+            placeholder="price per" required>
+    </div>
+
+    <input class="input-small"
+        type="number"
+        min="0"
+        max="250"
+        ng-model="quantity" placeholder="quantity" required>
+
+    <input class="btn"
+        ng-disabled="orderForm.$invalid"
+        ng-click="placeBuyOrder()"
+        type="submit" value="Place Buy Order">
+
+    <input class="btn"
+        ng-click="placeSellOrder()"
+        ng-disabled=
+            "orderForm.$invalid || !hasQuantity(item, quantity)"
+        type="submit" value="Place Sell Order">
+
+</form>

@@ -1,7 +1,11 @@
 input.ng-invalid.ng-dirty {
-    background-color: #FA787E;
+    /*background-color: #FA787E;*/
 }
 
 input.ng-valid.ng-dirty {
-    background-color: white;
+    /*background-color: white;*/
+}
+
+thead td {
+    font-weight: bold;
 }
