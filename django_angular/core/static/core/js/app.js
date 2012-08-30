@@ -90,17 +90,27 @@ function TraderCtrl($scope) {
   $scope.buyOrderValue = function(order){
     var total = 0;
     if (order) {
-      return (order.quantity - order.fills) * order.amount;
+      return (order.quantity - order.fills) * order.price;
     }
     angular.forEach($scope.buyOrders, function(order){
-      total += (order.quantity - order.fills) * order.amount;
+      total += (order.quantity - order.fills) * order.price;
     });
     return total;
   };
 
   $scope.inventoryValue = function(order){
     var total = 0;
+    if (order) {
+      return order.fills * order.price;
+    }
+    angular.forEach($scope.buyOrders, function(order) {
+      total += (order.fills * order.price);
+    });
     return total;
+  };
+  
+  $scope.profit = function() {
+    return 0;
   };
 
   $scope.status = function(order) {
