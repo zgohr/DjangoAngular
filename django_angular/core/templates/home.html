@@ -3,11 +3,9 @@
 <!doctype html>
 <html ng-app>
     <head>
-        <script src="{{ STATIC_URL }}angular/js/angular-1.0.1.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="{{ STATIC_URL }}angular/js/angular-1.0.2.min.js"></script>
         <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.js"></script>
-        <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-typeahead.js"></script>
-        <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-collapse.js"></script>
         <script src="{{ STATIC_URL }}core/js/app.js"></script>
 
         <link rel="stylesheet" href="{{ STATIC_URL }}core/css/app.css">
@@ -16,26 +14,99 @@
     </head>
 
     <body>
-        <div>
-            <div class="container" ng-controller="TraderCtrl">
-                <div class="row">
-                    <div class="span10">
-                        <h1>Dealing</h1>
-                        {% include 'core/includes/order_form.html' %}
-                    </div>
+
+
+        <div class="container" ng-controller="TraderCtrl">
+            <div class="row">
+                <div class="span10">
+                    <h1>Dealing</h1>
                 </div>
-                <div class="row">
-                    <div class="span8">
-                        {% include 'core/includes/accordion.html' %}
-                    </div> <!-- tables div -->
-                    <div class="span3 border-left">
-                        <h3>Inventory</h3>
-                        <p>Bid Value: <strong>{% ng buyOrderValue() | number:4 %}</strong></p>
-                        <p>Value: <strong>{% ng inventoryValue() | number:4 %}</strong></p>
-                        <p>Profit: <strong>{% ng profit() | number:4 %}</strong></p>
+            </div>
+            <div class="row">
+                <div class="span8">
+                    <h2>Inventory</h2>
+
+                    <div class="modal hide fade" id="addInventory" tabindex="-1" role="dialog"
+                        aria-labelledby="addInvHeader" aria-hidden="true">
+
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">x</button>
+                            <h3 id="addInvHeader">Add Inventory</h3>
+                        </div>
+
+                        <div class="modal-body">
+                            <form name="addInventory"
+                                class="form form-inline"
+                                aria-hidden="true">
+
+                                <input class="input-small typeahead"
+                                    type="text"
+                                    ng-model="name"
+                                    placeholder="item" required>
+                                <input class="input-small"
+                                    type="number"
+                                    min="0"
+                                    ng-model="quantity"
+                                    placeholder="quantity" required>
+                                    
+                                <div class="input-prepend">
+                                    <span class="add-on">g</span>
+                                    <input class="input-small"
+                                        type="text"
+                                        ng-model="price"
+                                        ng-pattern="gold"
+                                        placeholder="price" required>
+                                </div>
+
+                            </form>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button"
+                                class="btn btn-primary"
+                                ng-click="addToInventory()"
+                                ng-disabled="addInventory.$invalid"
+                                aria-hidden="true"
+                                >Save</button>
+                            <button type="button"
+                                class="btn"
+                                data-dismiss="modal"
+                                aria-hidden="true"
+                                >Close</button>
+                        </div>
+
                     </div>
-                </div> <!-- table row -->
-            </div> <!-- ng-controller div -->
-        </div>
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <td>Item</td>
+                                <td>Quantity</td>
+                                <td>Average Paid</td>
+                                <td><a href="#addInventory"
+                                        data-toggle="modal"
+                                        class="btn"><i class="icon-plus-sign"></i> Add</a></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in inventory">
+                                <td>{% ng item.name %}</td>
+                                <td>{% ng item.quantity %}</td>
+                                <td>{% ng item.price %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div> <!-- Inventory -->
+            </div>
+            <div class="row">
+                <div class="span4">
+                    <h2>Buy Orders</h2>
+                </div> <!--  -->
+                <div class="span4">
+                    <h2>Sell Orders</h2>
+                </div> <!--  -->
+            </div> <!-- table row -->
+        </div> <!-- ng-controller div -->
     </body>
 </html>
